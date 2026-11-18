@@ -40,6 +40,9 @@ dependencies:
   shared_preferences: ^2.3.3
   provider: ^6.1.2
 
+  # UI typography
+  google_fonts: ^6.3.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
