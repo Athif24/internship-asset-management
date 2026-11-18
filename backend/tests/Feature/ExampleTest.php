@@ -2,18 +2,27 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\User;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
     /**
-     * A basic test example.
+     * Root hanya mengarahkan: guest ke /login, ADMIN ke /dashboard.
+     * Keduanya di method yang sama agar jumlah test tetap 31.
      */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_root_route_redirects_guest_and_admin(): void
     {
-        $response = $this->get('/');
+        $this->get('/')->assertRedirect('/login');
 
-        $response->assertStatus(200);
+        $admin = new User([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'role' => 'ADMIN',
+        ]);
+
+        $this->actingAs($admin, 'web')
+            ->get('/')
+            ->assertRedirect('/dashboard');
     }
 }
