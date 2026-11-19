@@ -19,11 +19,11 @@ import '../widgets/stat_card.dart';
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  void _logout(BuildContext context) {
+  Future<void> _logout(BuildContext context) async {
     final AuthController auth = authControllerOf(context);
     final NavigatorState navigator = Navigator.of(context);
 
-    auth.signOut();
+    await auth.signOut();
     navigator.pushAndRemoveUntil<void>(
       MaterialPageRoute<void>(
         builder: (BuildContext context) => const LoginPage(),

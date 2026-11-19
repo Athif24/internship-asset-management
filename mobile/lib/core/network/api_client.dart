@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../storage/token_storage.dart';
@@ -16,8 +17,8 @@ class ApiClient {
     required this.baseUrl,
     http.Client? client,
     TokenStorage? tokenStorage,
-  })  : _client = client ?? http.Client(),
-        _tokenStorage = tokenStorage ?? TokenStorage();
+  }) : _client = client ?? http.Client(),
+       _tokenStorage = tokenStorage ?? TokenStorage();
 
   final String baseUrl;
   final http.Client _client;
@@ -31,11 +32,7 @@ class ApiClient {
     return _request('GET', path, query: query, authenticated: authenticated);
   }
 
-  Future<dynamic> post(
-    String path, {
-    Object? body,
-    bool authenticated = true,
-  }) {
+  Future<dynamic> post(String path, {Object? body, bool authenticated = true}) {
     return _request('POST', path, body: body, authenticated: authenticated);
   }
 
@@ -50,7 +47,13 @@ class ApiClient {
     Object? body,
     bool authenticated = true,
   }) async {
-    final uri = Uri.parse('$baseUrl$path').replace(queryParameters: query);
+    // ApiEndpoints sudah menghasilkan URL absolut (baseUrl + path).
+    // Jangan tambahkan baseUrl dua kali bila path sudah diawali http(s).
+    final resolvedUrl =
+        path.startsWith('http://') || path.startsWith('https://')
+        ? path
+        : '$baseUrl$path';
+    final uri = Uri.parse(resolvedUrl).replace(queryParameters: query);
     final headers = <String, String>{'Accept': 'application/json'};
 
     if (body != null) {
@@ -88,17 +91,30 @@ class ApiClient {
           );
       }
     } on SocketException catch (e) {
+      if (kDebugMode) {
+        debugPrint('[API] $method $uri NETWORK_ERROR: ${e.message}');
+      }
       throw ApiException(
         statusCode: 0,
         code: 'NETWORK_ERROR',
-        message: 'Tidak dapat terhubung ke server. Periksa koneksi dan alamat API.',
+        message:
+            'Tidak dapat terhubung ke server. Periksa koneksi dan alamat API.',
         detail: e.message,
       );
     } on http.ClientException catch (e) {
+      if (kDebugMode) {
+        debugPrint('[API] $method $uri NETWORK_ERROR: ${e.message}');
+      }
       throw ApiException(
         statusCode: 0,
         code: 'NETWORK_ERROR',
         message: 'Gagal menghubungi server: ${e.message}',
+      );
+    }
+
+    if (kDebugMode) {
+      debugPrint(
+        '[API] $method $uri -> ${response.statusCode} ${response.body}',
       );
     }
 
@@ -125,12 +141,16 @@ class ApiClient {
       final error = payload['error'];
       final errorMap = error is Map<String, dynamic> ? error : null;
 
-      throw ApiException(
+      final apiException = ApiException(
         statusCode: response.statusCode,
         code: errorMap?['code'] as String? ?? 'HTTP_${response.statusCode}',
         message: payload['message'] as String? ?? 'Permintaan gagal.',
         detail: errorMap?['detail'],
       );
+      if (kDebugMode) {
+        debugPrint('[API] ERROR ${apiException.code}: ${apiException.message}');
+      }
+      throw apiException;
     }
 
     return payload['data'];

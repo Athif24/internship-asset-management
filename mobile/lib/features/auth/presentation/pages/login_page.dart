@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/navigation/app_shell.dart';
@@ -113,9 +115,11 @@ class _LoginPageState extends State<LoginPage> {
               ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight:
-                      constraints.maxHeight -
-                      AppDimensions.loginVerticalPadding * 2,
+                  minHeight: math.max(
+                    0.0,
+                    constraints.maxHeight -
+                        AppDimensions.loginVerticalPadding * 2,
+                  ),
                 ),
                 child: Center(
                   child: ConstrainedBox(

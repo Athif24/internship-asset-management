@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../../app/di/api_bridge.dart';
+import '../../data/storage/auth_user_cache.dart';
 import 'auth_service.dart';
 import 'auth_user.dart';
 
@@ -26,12 +27,34 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void signOut() {
+  /// Dipakai saat aplikasi dibuka ulang: mengembalikan sesi dari cache
+  /// tanpa melewati form login.
+  void restoreSession(AuthUser user) {
+    _user = user;
+    notifyListeners();
+  }
+
+  /// Hapus sesi UI tanpa memanggil backend (dipakai saat token terbukti 401).
+  void clearSession() {
+    _user = null;
+    notifyListeners();
+  }
+
+  Future<void> signOut() async {
     if (_user == null) {
       return;
     }
-    _user = null;
-    notifyListeners();
-    ApiBridge.instance.logout();
+
+    clearSession();
+    await AuthUserCache().clear();
+
+    try {
+      await ApiBridge.instance.logout();
+    } catch (error) {
+      // TOKEN sudah dihapus di repository meski request logout gagal.
+      if (kDebugMode) {
+        debugPrint('[AUTH] logout error: $error');
+      }
+    }
   }
 }

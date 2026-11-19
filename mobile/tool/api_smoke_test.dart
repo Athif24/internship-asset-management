@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 ///
 /// Jalankan:
 ///   dart run tool/api_smoke_test.dart
-///   dart run --dart-define=API_BASE_URL=http://10.0.2.2:8000/api tool/api_smoke_test.dart
+///   dart run -DAPI_BASE_URL=http://10.0.2.2:8000/api tool/api_smoke_test.dart
 const baseUrl = String.fromEnvironment(
   'API_BASE_URL',
   defaultValue: 'http://127.0.0.1:8000/api',
