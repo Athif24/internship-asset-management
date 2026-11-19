@@ -9,7 +9,8 @@ class AssetSeeder extends Seeder
 {
     public function run(): void
     {
-        // Kolom lama (kode, nama, kategori, status) tidak diubah.
+        // Kolom lama (kode, nama, kategori, status) tidak diubah pada aset yang
+        // sudah ada: status mencerminkan transaksi pinjaman aktif, bukan data seed.
         // Dua kolom baru diisi untuk seluruh 10 aset.
         $assets = [
             ['id' => 1,  'assets_code' => 'AST-LPT-001', 'name' => 'Laptop Dell Latitude 5420',     'category_id' => 1, 'status' => 'AVAILABLE',   'purchase_price' => 12500000, 'purchase_year' => 2022],
@@ -25,7 +26,16 @@ class AssetSeeder extends Seeder
         ];
 
         foreach ($assets as $asset) {
-            DB::table('assets')->updateOrInsert(['id' => $asset['id']], $asset);
+            $exists = DB::table('assets')->where('id', $asset['id'])->exists();
+
+            if ($exists) {
+                DB::table('assets')->where('id', $asset['id'])->update([
+                    'purchase_price' => $asset['purchase_price'],
+                    'purchase_year' => $asset['purchase_year'],
+                ]);
+            } else {
+                DB::table('assets')->insert($asset);
+            }
         }
     }
 }

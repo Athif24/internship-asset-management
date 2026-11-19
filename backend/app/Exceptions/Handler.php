@@ -182,6 +182,10 @@ class Handler extends ExceptionHandler
             return ApiResponse::error('Kode aset sudah digunakan.', 'AST-01', $driverMessage, 409);
         }
 
+        if (str_contains($haystack, '1062') && str_contains($haystack, 'uq_assets_loan_active')) {
+            return ApiResponse::error('Aset sedang dipinjam.', 'AST-03', $driverMessage, 409);
+        }
+
         if (str_contains($haystack, '1205') || str_contains($haystack, 'Lock wait timeout')) {
             return ApiResponse::error(
                 'Aset sedang diproses, silakan coba lagi.',
