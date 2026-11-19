@@ -8,6 +8,8 @@ class AssetModel extends Asset {
     required super.categoryId,
     required super.status,
     super.categoryName,
+    super.purchasePrice,
+    super.purchaseYear,
   });
 
   factory AssetModel.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,8 @@ class AssetModel extends Asset {
       categoryId: (json['category_id'] as num?)?.toInt() ?? 0,
       status: json['status'] as String? ?? 'AVAILABLE',
       categoryName: categoryMap?['name'] as String?,
+      purchasePrice: double.tryParse(json['purchase_price']?.toString() ?? ''),
+      purchaseYear: (json['purchase_year'] as num?)?.toInt(),
     );
   }
 }

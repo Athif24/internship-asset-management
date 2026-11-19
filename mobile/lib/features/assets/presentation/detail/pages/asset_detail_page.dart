@@ -169,6 +169,8 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                 code: widget.asset.code,
                 category: widget.asset.category,
                 status: _status,
+                purchasePrice: widget.asset.purchasePrice,
+                purchaseYear: widget.asset.purchaseYear,
               ),
               if (_errorMessage != null) ...<Widget>[
                 const SizedBox(height: AppDimensions.detailErrorSpacing),

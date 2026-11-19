@@ -8,6 +8,8 @@ class AssetItem {
     required this.code,
     required this.category,
     required this.status,
+    this.purchasePrice,
+    this.purchaseYear,
   });
 
   final String id;
@@ -15,6 +17,8 @@ class AssetItem {
   final String code;
   final String category;
   final AssetStatus status;
+  final double? purchasePrice;
+  final int? purchaseYear;
 
   /// Salinan dengan sebagian field diganti (dipakai saat refresh status).
   AssetItem copyWith({
@@ -23,6 +27,8 @@ class AssetItem {
     String? code,
     String? category,
     AssetStatus? status,
+    double? purchasePrice,
+    int? purchaseYear,
   }) {
     return AssetItem(
       id: id ?? this.id,
@@ -30,6 +36,8 @@ class AssetItem {
       code: code ?? this.code,
       category: category ?? this.category,
       status: status ?? this.status,
+      purchasePrice: purchasePrice ?? this.purchasePrice,
+      purchaseYear: purchaseYear ?? this.purchaseYear,
     );
   }
 }

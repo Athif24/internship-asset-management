@@ -50,8 +50,12 @@ class LoanCard extends StatelessWidget {
                     const SizedBox(
                       height: AppDimensions.historyCardMetaSpacing,
                     ),
+                    Text(loan.assetCode, style: AppTextStyles.historyCardMeta),
+                    const SizedBox(
+                      height: AppDimensions.historyCardMetaSpacing,
+                    ),
                     Text(
-                      loanSubtitle(loan),
+                      loanDateLine(loan),
                       style: AppTextStyles.historyCardMeta,
                     ),
                   ],

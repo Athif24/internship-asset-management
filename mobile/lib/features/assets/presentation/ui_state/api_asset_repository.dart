@@ -10,8 +10,7 @@ import 'asset_repository.dart';
 ///
 /// Widget UI tetap membaca `assets`, `loans`, dan `clock` seperti sebelumnya.
 class ApiAssetRepository extends AssetRepository {
-  ApiAssetRepository({super.clock})
-    : super(assets: const [], loans: const []) {
+  ApiAssetRepository({super.clock}) : super(assets: const [], loans: const []) {
     final bridge = ApiBridge.instance;
     bridge.assetController?.addListener(_sync);
     bridge.loanController?.addListener(_sync);
@@ -70,6 +69,8 @@ class ApiAssetRepository extends AssetRepository {
       code: asset.assetsCode,
       category: asset.categoryName ?? 'Lainnya',
       status: _status(asset.status),
+      purchasePrice: asset.purchasePrice,
+      purchaseYear: asset.purchaseYear,
     );
   }
 

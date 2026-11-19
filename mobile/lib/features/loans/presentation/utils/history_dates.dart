@@ -2,7 +2,8 @@ import '../../../../core/filter/filter_utils.dart' as filter_utils;
 import '../../../assets/domain/entities/loan_item.dart';
 import '../../domain/entities/month_key.dart';
 
-export '../../../../core/filter/filter_utils.dart' show normalizeSelectedCategory;
+export '../../../../core/filter/filter_utils.dart'
+    show normalizeSelectedCategory;
 
 /// Fungsi murni untuk tanggal, tab, filter, dan ringkasan Riwayat (tanpa `intl`).
 const List<String> kMonthAbbreviations = <String>[
@@ -154,12 +155,12 @@ int activeFilterCount(Set<MonthKey> months, String? category) {
   return months.length + (hasCategory ? 1 : 0);
 }
 
-/// Satu-satunya baris meta kartu: kode + tanggal, tanpa duplikasi tanggal.
-String loanSubtitle(LoanItem loan) {
+/// Baris tanggal saja. Kode aset ditampilkan terpisah oleh widget kartu.
+String loanDateLine(LoanItem loan) {
   if (loan.isActive) {
-    return '${loan.assetCode} · Sejak ${formatDateTime(loan.borrowDate)}';
+    return 'Sejak ${formatDateTime(loan.borrowDate)}';
   }
-  return '${loan.assetCode} · Dikembalikan ${formatDateTime(loan.returnDate!)}';
+  return 'Dikembalikan ${formatDateTime(loan.returnDate!)}';
 }
 
 String summaryText(HistoryTab tab, int count) {
