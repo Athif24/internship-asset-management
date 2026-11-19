@@ -15,6 +15,13 @@ class Asset extends Model
         'name',
         'category_id',
         'status',
+        'purchase_price',
+        'purchase_year',
+    ];
+
+    protected $casts = [
+        'purchase_price' => 'decimal:2',
+        'purchase_year' => 'integer',
     ];
 
     public function category()

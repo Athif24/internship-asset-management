@@ -1,6 +1,6 @@
 import { api } from '../api.js';
 import {
-    statusBadge, formatLoanDate, escapeHtml, emptyRow,
+    statusBadge, formatLoanDate, formatPrice, escapeHtml, emptyRow,
     toast, friendlyError, options, openModal, confirmDialog, fieldValue,
     errorState, clearErrorState, showPageError, isPageLevelError,
     registerSilentRefresh,
@@ -110,10 +110,11 @@ async function load() {
                 </td>
                 <td>${escapeHtml(asset.category?.name || '-')}</td>
                 <td>${statusBadge(asset.status)}</td>
+                <td class="cell-nowrap">${formatPrice(asset.purchase_price)}${asset.purchase_year ? ' · ' + escapeHtml(asset.purchase_year) : ''}</td>
                 <td>
                     <button type="button" class="btn sec btn-sm" data-action="edit" data-id="${asset.id}">Edit</button>
                 </td>
-            </tr>`).join('') : emptyRow(5, 'Belum ada data.');
+            </tr>`).join('') : emptyRow(6, 'Belum ada data.');
     } catch (error) {
         if (isPageLevelError(error)) {
             showPageError(root, error, () => window.location.reload());
@@ -147,6 +148,8 @@ function formContent(asset = null) {
     if (isEdit) {
         holder.querySelector('[name="assets_code"]').value = asset.assets_code || '';
         holder.querySelector('[name="name"]').value = asset.name || '';
+        holder.querySelector('[name="purchase_price"]').value = asset.purchase_price ?? '';
+        holder.querySelector('[name="purchase_year"]').value = asset.purchase_year ?? '';
 
         const category = holder.querySelector('[name="category_id"]');
         category.dataset.selected = asset.category_id || '';
@@ -196,6 +199,8 @@ function openForm(asset = null) {
                 assets_code: fieldValue(modal, 'assets_code'),
                 name: fieldValue(modal, 'name'),
                 category_id: fieldValue(modal, 'category_id'),
+                purchase_price: fieldValue(modal, 'purchase_price') || null,
+                purchase_year: fieldValue(modal, 'purchase_year') || null,
             };
 
             // Jangan kirim status jika aset sedang dipinjam (mencegah AST-10).
@@ -228,6 +233,8 @@ async function openDetail(id) {
         holder.querySelector('[data-detail="name"]').textContent = asset.name ?? '-';
         holder.querySelector('[data-detail="category"]').textContent = asset.category?.name ?? '-';
         holder.querySelector('[data-detail="status"]').innerHTML = statusBadge(asset.status);
+        holder.querySelector('[data-detail="price"]').textContent = formatPrice(asset.purchase_price);
+        holder.querySelector('[data-detail="year"]').textContent = asset.purchase_year ?? '-';
 
         const table = holder.querySelector('[data-detail="history-table"]');
         const empty = holder.querySelector('[data-detail="history-empty"]');

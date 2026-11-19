@@ -19,6 +19,8 @@ class StoreAssetRequest extends FormRequest
             'name' => ['required', 'string', 'max:200'],
             'category_id' => ['required', 'exists:assets_categories,id'],
             'status' => ['sometimes', 'in:AVAILABLE,MAINTENANCE'],
+            'purchase_price' => ['sometimes', 'nullable', 'numeric', 'min:0'],
+            'purchase_year' => ['sometimes', 'nullable', 'integer', 'between:1900,'.(date('Y') + 1)],
         ];
     }
 }

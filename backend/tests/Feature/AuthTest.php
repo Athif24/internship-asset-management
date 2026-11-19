@@ -45,6 +45,24 @@ class AuthTest extends TestCase
             ->assertJsonPath('error.code', 'INVALID_CREDENTIALS');
     }
 
+    public function test_user_tidak_boleh_login_di_web_admin(): void
+    {
+        // Web admin memakai session (guard web), bukan token Sanctum.
+        $response = $this->post('/login', [
+            'email' => 'budi@example.com',
+            'password' => 'Password123!',
+        ]);
+
+        $response->assertStatus(302)
+            ->assertSessionHasErrors([
+                'email' => 'Email ini terdaftar sebagai USER, bukan ADMIN. Akun USER hanya dapat login melalui aplikasi mobile. Hubungi administrator jika Anda seharusnya memiliki akses admin.',
+            ])
+            ->assertSessionHasInput('email', 'budi@example.com');
+
+        // Session USER harus dibuang, bukan sekadar ditolak redirect-nya.
+        $this->assertGuest();
+    }
+
     public function test_endpoint_tertutup_tanpa_token_mengembalikan_401(): void
     {
         $this->getJson('/api/me')

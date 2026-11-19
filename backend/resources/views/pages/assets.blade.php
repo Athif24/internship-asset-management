@@ -20,6 +20,7 @@
                     <th>NAMA</th>
                     <th>KATEGORI</th>
                     <th>STATUS</th>
+                    <th>HARGA / TAHUN BELI</th>
                     <th>AKSI</th>
                 </tr>
             </thead>
@@ -34,12 +35,20 @@
                         </td>
                         <td>{{ data_get($asset, 'category.name', '-') }}</td>
                         <td>@include('partials.status-badge', ['status' => data_get($asset, 'status')])</td>
+                        <td class="cell-nowrap">
+                            @if (data_get($asset, 'purchase_price') !== null || data_get($asset, 'purchase_year') !== null)
+                                {{ data_get($asset, 'purchase_price') !== null ? 'Rp'.number_format((float) data_get($asset, 'purchase_price'), 0, ',', '.') : '-' }}
+                                · {{ data_get($asset, 'purchase_year') ?? '-' }}
+                            @else
+                                -
+                            @endif
+                        </td>
                         <td>
                             <button type="button" class="btn sec btn-sm" data-action="edit" data-id="{{ data_get($asset, 'id') }}">Edit</button>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="empty-state"><strong>Tidak ada data</strong>Belum ada data.</td></tr>
+                    <tr><td colspan="6" class="empty-state"><strong>Tidak ada data</strong>Belum ada data.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -66,6 +75,14 @@
             @endforeach
         </select>
     </div>
+    <div class="form-group">
+        <label class="form-label" for="f-price">Harga awal beli (Rp)</label>
+        <input class="form-control" type="number" name="purchase_price" id="f-price" min="0" step="0.01" placeholder="Mis. 12500000">
+    </div>
+    <div class="form-group">
+        <label class="form-label" for="f-year">Tahun beli</label>
+        <input class="form-control" type="number" name="purchase_year" id="f-year" min="1900" max="{{ date('Y') + 1 }}" placeholder="Mis. 2022">
+    </div>
     <div class="form-group" id="f-status-group">
         <label class="form-label" for="f-status">Status</label>
         <select class="form-control" name="status" id="f-status">
@@ -89,6 +106,8 @@
         <dt>Nama</dt><dd data-detail="name"></dd>
         <dt>Kategori</dt><dd data-detail="category"></dd>
         <dt>Status</dt><dd data-detail="status"></dd>
+        <dt>Harga Beli</dt><dd data-detail="price"></dd>
+        <dt>Tahun Beli</dt><dd data-detail="year"></dd>
     </dl>
     <div class="detail-section-title">Riwayat Pinjaman</div>
     <div class="table-wrap" data-detail="history-table">

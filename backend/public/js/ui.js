@@ -46,6 +46,18 @@ export function formatLoanDate(value) {
     return `${Number(day)} ${month} ${year}, ${hour}:${minute}`;
 }
 
+export function formatPrice(value) {
+    if (value === null || value === undefined || value === '') return '-';
+    const amount = Number(value);
+    if (!Number.isFinite(amount)) return '-';
+
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0,
+    }).format(amount);
+}
+
 export function friendlyError(error) {
     const map = {
         'AST-01': 'Kode aset sudah digunakan (AST-01, HTTP 409).',

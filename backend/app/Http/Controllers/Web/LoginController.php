@@ -35,7 +35,7 @@ class LoginController extends Controller
 
             return redirect()->back()
                 ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Akun ini bukan Asset Admin. Hanya ADMIN yang dapat masuk ke Web Admin.']);
+                ->withErrors(['email' => 'Email ini terdaftar sebagai USER, bukan ADMIN. Akun USER hanya dapat login melalui aplikasi mobile. Hubungi administrator jika Anda seharusnya memiliki akses admin.']);
         }
 
         return redirect()->intended('/dashboard');

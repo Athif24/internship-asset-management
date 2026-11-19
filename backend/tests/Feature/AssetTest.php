@@ -165,4 +165,86 @@ class AssetTest extends TestCase
 
         $this->assertDatabaseHas('assets', ['id' => 2, 'status' => 'BORROWED']);
     }
+
+    public function test_admin_dapat_menyimpan_harga_dan_tahun_beli(): void
+    {
+        $admin = User::where('role', 'ADMIN')->firstOrFail();
+
+        $this->actingAs($admin, 'sanctum')
+            ->postJson('/api/assets', [
+                'assets_code' => 'AST-NEW-001',
+                'name' => 'Aset dengan harga beli',
+                'category_id' => 1,
+                'purchase_price' => 15000000,
+                'purchase_year' => 2023,
+            ])
+            ->assertStatus(201)
+            ->assertJsonPath('data.asset.purchase_price', '15000000.00')
+            ->assertJsonPath('data.asset.purchase_year', 2023);
+
+        $this->assertDatabaseHas('assets', [
+            'assets_code' => 'AST-NEW-001',
+            'purchase_price' => '15000000.00',
+            'purchase_year' => 2023,
+        ]);
+    }
+
+    public function test_validasi_harga_dan_tahun_beli_ditolak(): void
+    {
+        $admin = User::where('role', 'ADMIN')->firstOrFail();
+
+        $response = $this->actingAs($admin, 'sanctum')
+            ->postJson('/api/assets', [
+                'assets_code' => 'AST-INVALID-001',
+                'name' => 'Validasi harga dan tahun',
+                'category_id' => 1,
+                'purchase_price' => -1,
+                'purchase_year' => 2030,
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('error.code', 'VALIDATION_ERROR');
+
+        // Handler memakai envelope API: detail validasi ada di error.detail.
+        $detail = $response->json('error.detail');
+        $this->assertArrayHasKey('purchase_price', $detail);
+        $this->assertArrayHasKey('purchase_year', $detail);
+
+        $this->assertDatabaseMissing('assets', ['assets_code' => 'AST-INVALID-001']);
+    }
+
+    public function test_detail_aset_memuat_harga_dan_tahun_beli(): void
+    {
+        $admin = User::where('role', 'ADMIN')->firstOrFail();
+
+        $this->actingAs($admin, 'sanctum')
+            ->getJson('/api/assets/1')
+            ->assertOk()
+            ->assertJsonPath('data.asset.purchase_price', '12500000.00')
+            ->assertJsonPath('data.asset.purchase_year', 2022);
+    }
+
+    public function test_update_harga_dan_tahun_beli_berhasil(): void
+    {
+        $admin = User::where('role', 'ADMIN')->firstOrFail();
+
+        $this->actingAs($admin, 'sanctum')
+            ->putJson('/api/assets/1', [
+                'assets_code' => 'AST-LPT-001',
+                'name' => 'Laptop Dell Latitude 5420',
+                'category_id' => 1,
+                'purchase_price' => 13000000,
+                'purchase_year' => 2024,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.asset.purchase_price', '13000000.00')
+            ->assertJsonPath('data.asset.purchase_year', 2024);
+
+        $this->assertDatabaseHas('assets', [
+            'id' => 1,
+            'purchase_price' => '13000000.00',
+            'purchase_year' => 2024,
+        ]);
+    }
 }

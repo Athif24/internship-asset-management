@@ -25,6 +25,8 @@ class UpdateAssetRequest extends FormRequest
             'category_id' => ['required', 'exists:assets_categories,id'],
             // BORROWED tidak boleh diset manual: hanya stored procedure yang boleh.
             'status' => ['sometimes', 'in:AVAILABLE,MAINTENANCE'],
+            'purchase_price' => ['sometimes', 'nullable', 'numeric', 'min:0'],
+            'purchase_year' => ['sometimes', 'nullable', 'integer', 'between:1900,'.(date('Y') + 1)],
         ];
     }
 }
