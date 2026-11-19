@@ -240,6 +240,7 @@ export function showFieldErrors(modal, detail) {
 /* -------------------------------------------------------------------------- */
 
 let silentRefreshHandler = null;
+let silentRefreshRunning = false;
 
 export function registerSilentRefresh(handler) {
     silentRefreshHandler = handler;
@@ -247,12 +248,20 @@ export function registerSilentRefresh(handler) {
 
 export function runSilentRefresh() {
     if (document.visibilityState !== 'visible') return;
+    // Jangan timpa form yang sedang dibuka (edit/detail).
     if (document.querySelector('.modal-overlay')) return;
+    // Cegah request bertumpuk bila server lebih lambat dari interval.
+    if (silentRefreshRunning) return;
     if (typeof silentRefreshHandler !== 'function') return;
 
-    Promise.resolve(silentRefreshHandler()).catch(() => {
-        // Error sudah ditangani masing-masing halaman.
-    });
+    silentRefreshRunning = true;
+    Promise.resolve(silentRefreshHandler())
+        .catch(() => {
+            // Error sudah ditangani masing-masing halaman.
+        })
+        .finally(() => {
+            silentRefreshRunning = false;
+        });
 }
 
 /* -------------------------------------------------------------------------- */

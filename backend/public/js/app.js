@@ -15,6 +15,9 @@ const pages = {
     loans: initLoans,
 };
 
+// Sinkronisasi status dari mobile tanpa menunggu pindah tab / reload manual.
+const REFRESH_INTERVAL_MS = 5000;
+
 function setupShell() {
     const sidebar = document.getElementById('sidebar');
     const backdrop = document.getElementById('sidebar-backdrop');
@@ -88,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    window.setInterval(runSilentRefresh, REFRESH_INTERVAL_MS);
     setupShell();
 
     const initializer = pages[page];
